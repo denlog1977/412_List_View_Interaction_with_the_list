@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name='412_List_View_Interaction_with_the_list'
