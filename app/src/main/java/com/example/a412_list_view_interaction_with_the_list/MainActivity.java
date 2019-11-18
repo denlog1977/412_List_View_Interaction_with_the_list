@@ -2,6 +2,7 @@ package com.example.a412_list_view_interaction_with_the_list;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,13 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.nio.file.Paths.get;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences mySharedPref;
     private static String LARGE_TEXT = "";
     private static String dateFromSharedPref = "";
+    private List<Map<String, String>> content;
+    private SimpleAdapter listContentAdapter;
+    private SwipeRefreshLayout swipeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,13 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         mySharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
-//        try {
-            getDateFromSharedPref();
-//        } catch (Exception e) {
-//            Toast.makeText(this, " ошибка получения LARGE_TEXT из SharedPreferences", Toast.LENGTH_SHORT).show();
-//        };
-
-
+        getDateFromSharedPref();
 
         if (dateFromSharedPref == "") {
             SharedPreferences.Editor myEditor = mySharedPref.edit();
@@ -52,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
         ListView listView = findViewById(R.id.listView);
 
-        List<Map<String, String>> content = prepareContent();
+        content = prepareContent();
 
-        SimpleAdapter listContentAdapter = createAdapter(content);
+        listContentAdapter = createAdapter(content);
 
         listView.setAdapter(listContentAdapter);
 
@@ -68,15 +66,41 @@ public class MainActivity extends AppCompatActivity {
 
                 // position - номер строки, можно получить данные по этому номеру и взять текст из них
 
-                String textListItem = ((Map) final listContentAdapter.getItem(position)).get("text").toString();
-                String length = ((Map) final listContentAdapter.getItem(position)).get("length").toString();
-                Toast.makeText(getApplicationContext(), "listContentAdapter.getItem "  + textListItem + " " + length, Toast.LENGTH_SHORT).show();
+//                String textListItem = ((Map) listContentAdapter.getItem(position)).get("text").toString();
+//                String length = ((Map) listContentAdapter.getItem(position)).get("length").toString();
+//                Toast.makeText(getApplicationContext(), textListItem + "\n[длина текста = " + length + "]", Toast.LENGTH_SHORT).show();
+
+                content.remove(position);
+                listContentAdapter.notifyDataSetChanged();
+
+//                Toast.makeText(getApplicationContext(), " --- contentSize --- " + Integer.toString(content.size()), Toast.LENGTH_SHORT).show();
+
             }
         });
 
+
+
+        swipeLayout = findViewById(R.id.swiperefresh);
+        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            // Будет вызван, когда пользователь потянет список вниз
+            @Override public void onRefresh()
+            {
+//                updateList();
+                getDateFromSharedPref();
+                content = prepareContent();
+                Toast.makeText(getApplicationContext(), " --- contentSize --- " + Integer.toString(content.size()), Toast.LENGTH_SHORT).show();
+
+                listContentAdapter.notifyDataSetChanged();
+
+
+                swipeLayout.setRefreshing(false);
+
+
+            }
+
+        });
+
     }
-
-
 
 
 
@@ -102,6 +126,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void getDateFromSharedPref(){
         dateFromSharedPref = mySharedPref.getString(LARGE_TEXT, "");
+    }
+
+    private void updateList(){
+        getDateFromSharedPref();
+        content = prepareContent();
+        Toast.makeText(getApplicationContext(), " --- contentSize --- " + Integer.toString(content.size()), Toast.LENGTH_SHORT).show();
+
+        listContentAdapter.notifyDataSetChanged();
     }
 
 }
