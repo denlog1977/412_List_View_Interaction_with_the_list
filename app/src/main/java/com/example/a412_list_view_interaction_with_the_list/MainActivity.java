@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -56,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 //                // параметр view - строка, на которую кликнул пользователь, можно получить текст из нее
@@ -75,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
 
         swipeLayout = findViewById(R.id.swiperefresh);
         swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            // Будет вызван, когда пользователь потянет список вниз
             @Override public void onRefresh() {
+                getTextFromSharedPref();
                 updateList();
-//                listContentAdapter.notifyDataSetChanged();
+                listContentAdapter.notifyDataSetChanged();
                 swipeLayout.setRefreshing(false);
             }
         });
@@ -86,11 +86,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateList(){
-        getTextFromSharedPref();
-        content = prepareContent();
-        listContentAdapter = createAdapter(content);
-        listView.setAdapter(listContentAdapter);
-//        Toast.makeText(getApplicationContext(), " --- contentSize --- " + Integer.toString(content.size()), Toast.LENGTH_SHORT).show();
+        content.clear();
+        content.addAll(prepareContent());
     }
 
 
