@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             // Будет вызван, когда пользователь потянет список вниз
             @Override public void onRefresh() {
                 updateList();
-                listContentAdapter.notifyDataSetChanged();
+//                listContentAdapter.notifyDataSetChanged();
                 swipeLayout.setRefreshing(false);
             }
         });
@@ -88,7 +88,9 @@ public class MainActivity extends AppCompatActivity {
     private void updateList(){
         getTextFromSharedPref();
         content = prepareContent();
-        Toast.makeText(getApplicationContext(), " --- contentSize --- " + Integer.toString(content.size()), Toast.LENGTH_SHORT).show();
+        listContentAdapter = createAdapter(content);
+        listView.setAdapter(listContentAdapter);
+//        Toast.makeText(getApplicationContext(), " --- contentSize --- " + Integer.toString(content.size()), Toast.LENGTH_SHORT).show();
     }
 
 
